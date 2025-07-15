@@ -1,0 +1,577 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конвертер валют | Курсы ЦБ РФ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --warning-color: #f8961e;
+            --danger-color: #f94144;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #f5f7fa;
+            padding: 0;
+            margin: 0;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: var(--box-shadow);
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            font-weight: 300;
+            text-align: center;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        input[type="number"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: var(--light-color);
+        }
+
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .btn-secondary {
+            background: var(--accent-color);
+        }
+
+        .btn-secondary:hover {
+            background: #3a7bc8;
+        }
+
+        .btn-swap {
+            background: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .btn-swap:hover {
+            background: rgba(67, 97, 238, 0.1);
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(63, 55, 201, 0.1));
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0.5rem 0;
+        }
+
+        .rate-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .rate-code {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .rate-value {
+            font-weight: 500;
+        }
+
+        .alert {
+            position: relative;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: var(--border-radius);
+            background-color: rgba(248, 150, 30, 0.2);
+            border-left: 4px solid var(--warning-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .alert-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--warning-color);
+            padding: 0 0.5rem;
+        }
+
+        .date-info {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1rem;
+            text-align: right;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .swap-container {
+            display: flex;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+
+        .historical-info {
+            font-style: italic;
+            color: var(--secondary-color);
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            .result-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Конвертер валют</h1>
+            <p class="subtitle">Актуальные и исторические курсы Центрального Банка РФ</p>
+        </div>
+    </header>
+
+    <main class="container">
+
+
+        {% if error %}
+            <div class="alert" style="background-color: rgba(249, 65, 68, 0.2); border-left-color: var(--danger-color);">
+                <div>{{ error }}</div>
+            </div>
+        {% endif %}
+
+        {% if conversion_result %}
+        <div class="card result-card fade-in delay-1">
+            <h2 class="card-title">
+                {% if conversion_result.historical_date %}
+                Результат конвертации на {{ conversion_result.historical_date }}
+                {% else %}
+                Результат конвертации
+                {% endif %}
+            </h2>
+            <div class="result-value">
+                {{ "%.2f"|format(conversion_result.amount) }} {{ conversion_result.from_currency }} =
+                <span style="color: var(--secondary-color);">{{ "%.2f"|format(conversion_result.converted_amount) }}</span> {{ conversion_result.to_currency }}
+            </div>
+            <p>
+                <strong>{{ conversion_result.from_name }}</strong> → <strong>{{ conversion_result.to_name }}</strong>
+            </p>
+            <p class="date-info">
+                Курс: 1 {{ conversion_result.from_currency }} = {{ "%.6f"|format(conversion_result.rate) }} {{ conversion_result.to_currency }}
+                {% if conversion_result.historical_date %}
+                <span class="historical-info">(исторический курс на {{ conversion_result.historical_date }})</span>
+                {% endif %}
+            </p>
+
+            <div class="result-actions">
+                {% if conversion_result.historical_date %}
+                <button class="btn btn-secondary" onclick="resetHistoricalForm()">Конвертировать снова</button>
+                <button class="btn" onclick="window.location.href='/'">Новый расчет</button>
+                {% else %}
+                <button class="btn btn-secondary" onclick="resetForm()">Конвертировать снова</button>
+                <button class="btn" onclick="window.location.href='/'">Новый расчет</button>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card fade-in delay-1">
+            <h2 class="card-title">Конвертация валют (текущая дата)</h2>
+            <form action="/convert" method="get" id="converter-form">
+                <div class="form-group">
+                    <label for="amount">Сумма</label>
+                    <input type="number" name="amount" id="amount" required step="0.01" min="0.01"
+                           value="{{ conversion_result.amount if conversion_result and not conversion_result.historical_date else '' }}"
+                           placeholder="Введите сумму">
+                </div>
+
+                <div class="form-group">
+                    <label for="from_currency">Из валюты</label>
+                    <select name="from_currency" id="from_currency" required>
+                        <option value="">Выберите валюту</option>
+                        {% for currency in currencies %}
+                        <option value="{{ currency.code }}" {% if conversion_result and not conversion_result.historical_date and conversion_result.from_currency == currency.code %}selected{% endif %}>
+                            {{ currency.name }} ({{ currency.code }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="swap-container">
+                    <button type="button" class="btn btn-swap" onclick="swapCurrencies()">↔ Обменять валюты</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="to_currency">В валюту</label>
+                    <select name="to_currency" id="to_currency" required>
+                        <option value="">Выберите валюту</option>
+                        {% for currency in currencies %}
+                        <option value="{{ currency.code }}" {% if conversion_result and not conversion_result.historical_date and conversion_result.to_currency == currency.code %}selected{% endif %}>
+                            {{ currency.name }} ({{ currency.code }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-block">Конвертировать</button>
+            </form>
+        </div>
+
+        <div class="card fade-in delay-1">
+    <h2 class="card-title">Исторические курсы</h2>
+
+    {% if historical_error %}
+    <div class="alert fade-in" style="background-color: rgba(249, 65, 68, 0.2); border-left-color: var(--danger-color);">
+        <div>
+            <strong>Ошибка:</strong> {{ historical_error }}
+            {% if selected_date %}
+                <br><small>Выбранная дата: {{ selected_date }}</small>
+            {% endif %}
+        </div>
+        <button class="alert-close" onclick="this.parentElement.style.display='none'">×</button>
+    </div>
+{% endif %}
+
+    <form action="/historical" method="get" id="historical-form">
+        <div class="form-group">
+            <label for="date">Выберите дату</label>
+            <input type="date" name="date" id="date" max="{{ rates['Date'][:10] }}"
+                   value="{{ selected_date if selected_date else rates['Date'][:10] }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="h_amount">Сумма</label>
+            <input type="number" name="amount" id="h_amount" step="0.01" min="0.01"
+                   value="{{ conversion_result.amount if conversion_result and conversion_result.historical_date else '' }}"
+                   placeholder="Введите сумму">
+        </div>
+
+        <div class="form-group">
+            <label for="h_from_currency">Из валюты</label>
+            <select name="from_currency" id="h_from_currency">
+                <option value="">Выберите валюту</option>
+                {% for currency in currencies %}
+                <option value="{{ currency.code }}" {% if conversion_result and conversion_result.historical_date and conversion_result.from_currency == currency.code %}selected{% endif %}>
+                    {{ currency.name }} ({{ currency.code }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="h_to_currency">В валюту</label>
+            <select name="to_currency" id="h_to_currency">
+                <option value="">Выберите валюту</option>
+                {% for currency in currencies %}
+                <option value="{{ currency.code }}" {% if conversion_result and conversion_result.historical_date and conversion_result.to_currency == currency.code %}selected{% endif %}>
+                    {{ currency.name }} ({{ currency.code }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-block btn-secondary">Показать курсы</button>
+    </form>
+</div>
+
+        <div class="card fade-in delay-2">
+            <h2 class="card-title">
+                {% if selected_date %}
+                Курсы валют на {{ selected_date }}
+                {% else %}
+                Текущие курсы валют
+                {% endif %}
+            </h2>
+            <p class="date-info">Дата обновления: {{ rates['Date'] }}</p>
+
+            <div class="rates-list">
+                {% for currency in currencies %}
+                <div class="rate-item">
+                    <span class="rate-code">{{ currency.code }}</span>
+                    <span class="rate-value">
+                        {{ "%.4f"|format(currency.value / currency.nominal) }} ₽ за {{ currency.nominal }} {{ currency.name }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function closeAlert() {
+            const alert = document.getElementById('currency-alert');
+            if (alert) {
+                alert.style.opacity = '0';
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                    localStorage.setItem('alertClosed', 'true');
+                }, 300);
+            }
+        }
+
+        function resetForm() {
+            const amountField = document.getElementById('amount');
+            if (amountField) {
+                amountField.value = '';
+                amountField.focus();
+            }
+        }
+
+        function resetHistoricalForm() {
+            const amountField = document.getElementById('h_amount');
+            if (amountField) {
+                amountField.value = '';
+                amountField.focus();
+            }
+        }
+
+        function swapCurrencies() {
+            const fromCurrency = document.getElementById('from_currency');
+            const toCurrency = document.getElementById('to_currency');
+
+            if (fromCurrency && toCurrency) {
+                const temp = fromCurrency.value;
+                fromCurrency.value = toCurrency.value;
+                toCurrency.value = temp;
+            }
+        }
+
+        function validateCurrencySelection(fromId, toId, formId) {
+            const fromCurrency = document.getElementById(fromId);
+            const toCurrency = document.getElementById(toId);
+
+            if (fromCurrency && toCurrency && fromCurrency.value && toCurrency.value &&
+                fromCurrency.value === toCurrency.value) {
+                alert('Пожалуйста, выберите разные валюты для конвертации');
+                return false;
+            }
+            return true;
+        }
+
+        // Проверяем при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Показываем тело страницы
+            document.body.style.opacity = '1';
+
+            // Работа с предупреждением
+            const alertElement = document.getElementById('currency-alert');
+            if (alertElement) {
+                // Проверяем, было ли предупреждение закрыто ранее
+                const alertWasClosed = localStorage.getItem('alertClosed') === 'true';
+
+                if (!alertWasClosed) {
+                    // Показываем предупреждение с анимацией
+                    alertElement.style.display = 'flex';
+                    setTimeout(() => {
+                        alertElement.style.opacity = '1';
+                    }, 10);
+                }
+            }
+
+            // Если есть параметр reset в URL, сбрасываем сохраненное состояние
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('reset')) {
+                localStorage.removeItem('alertClosed');
+            }
+
+            // Валидация форм перед отправкой
+            const converterForm = document.getElementById('converter-form');
+            if (converterForm) {
+                converterForm.addEventListener('submit', function(e) {
+                    if (!validateCurrencySelection('from_currency', 'to_currency', 'converter-form')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            const historicalForm = document.getElementById('historical-form');
+            if (historicalForm) {
+                historicalForm.addEventListener('submit', function(e) {
+                    const amount = document.getElementById('h_amount').value;
+                    const fromCurrency = document.getElementById('h_from_currency').value;
+                    const toCurrency = document.getElementById('h_to_currency').value;
+
+                    // Проверяем, если заполнена хотя бы одна валюта, то должна быть заполнена и сумма
+                    if ((fromCurrency || toCurrency) && !amount) {
+                        alert('Для конвертации валют необходимо указать сумму');
+                        e.preventDefault();
+                        return false;
+                    }
+
+                    // Проверяем только если заполнены обе валюты
+                    if (fromCurrency && toCurrency && !validateCurrencySelection('h_from_currency', 'h_to_currency', 'historical-form')) {
+                        e.preventDefault();
+                        return false;
+                    }
+                    return true;
+                });
+            }
+
+            // Автоматическое заполнение исторической формы при наличии параметров
+            if (window.location.pathname === '/historical' && !{{ conversion_result|tojson|safe if conversion_result else 'false' }}) {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('date')) {
+                    document.getElementById('date').value = urlParams.get('date');
+                }
+                if (urlParams.has('amount')) {
+                    document.getElementById('h_amount').value = urlParams.get('amount');
+                }
+                if (urlParams.has('from_currency')) {
+                    document.getElementById('h_from_currency').value = urlParams.get('from_currency');
+                }
+                if (urlParams.has('to_currency')) {
+                    document.getElementById('h_to_currency').value = urlParams.get('to_currency');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
